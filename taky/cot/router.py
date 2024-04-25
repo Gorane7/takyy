@@ -35,6 +35,7 @@ class COTRouter:
         self.allowed_connections = eval(app_config.get("custom", "uid_to_ip"))
         print(self.allowed_connections)
         self.lgr = logging.getLogger(self.__class__.__name__)
+        self.ip_to_uid = {}
 
     def prune(self):
         now = time.time()
@@ -146,11 +147,26 @@ class COTRouter:
             raise ValueError(f"Unable to route {type(evt)}")
         
         # TODO: Remove, can't actually completely block anon traffic
-        if isinstance(src, TAKClient) and src.user is None or src.user.callsign is None:
-            print(f"Routing {evt}, despite {src} no callsign")
-            #return
-        else:
-            print(f"Routing {evt} from {src}")
+        #if isinstance(src, TAKClient) and src.user is None or src.user.callsign is None:
+        #    print(f"Routing {evt}, despite {src} no callsign")
+        #    #return
+        #else:
+        #    print(f"Routing {evt} from {src}")
+        
+        try:
+            client_ip = src.sock.getpeername()[0]
+            message_uid = evt.uid
+            if message_uid[:7] != "bridge-":
+                if client_ip not in self.ip_to_uid:
+                    self.ip_to_uid[client_ip] = set()
+                self.ip_to_uid[client_ip].add(message_uid)
+                if len(self.ip_to_uid[client_ip]) > 1:
+                    print(f"IP {client_ip} has sent multiple uid-s. Ignoring everything from that IP")
+                    print()
+                    return
+        except:
+            pass
+    
             
         try:
             client_ip = src.sock.getpeername()[0]
@@ -165,17 +181,18 @@ class COTRouter:
                     print(f"{client_ip} is allowed to send under {message_uid}")
                 else:
                     print(f"{client_ip} is not allowed to send under {message_uid}")
+                    print()
                     return
             #print(f"Checking if ip {client_ip} is allowed to send under uid {message_uid}")
         except:
             pass
         
-        #try:
-        #    message_uid = evt.uid
-        #    if message_uid[:7] == "bridge-":
-        #        pass
-        #except:
-        #    pass
+        try:
+            message_uid = evt.uid
+            if message_uid[:7] == "bridge-":
+                pass
+        except:
+            pass
         
         print()
 
