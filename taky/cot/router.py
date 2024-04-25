@@ -147,7 +147,7 @@ class COTRouter:
         
         # TODO: Remove, can't actually completely block anon traffic
         if isinstance(src, TAKClient) and src.user is None or src.user.callsign is None:
-            print(f"Not routing {evt}, because {src} does not have callsign")
+            print(f"Routing {evt}, despite {src} no callsign")
             #return
         else:
             print(f"Routing {evt} from {src}")
