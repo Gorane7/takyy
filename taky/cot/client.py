@@ -303,6 +303,13 @@ class TAKClient:
                     self.pong()
                     continue
 
+                # Drop sea locations, love you RT
+                if evt.point.lat <= 55 or evt.point.lat >= 59.5:
+                    continue
+
+                if evt.point.lon <= -35.5 or evt.point.lon >= -19.6:
+                    continue
+
                 if evt.etype.startswith("a"):
                     self.handle_atom(evt)
 
