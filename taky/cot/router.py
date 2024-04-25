@@ -154,6 +154,8 @@ class COTRouter:
         #    print(f"Routing {evt} from {src}")
         
         try:
+            # Removed this
+            {}[0]
             client_ip = src.sock.getpeername()[0]
             message_uid = evt.uid
             if message_uid[:7] != "bridge-":
@@ -172,17 +174,28 @@ class COTRouter:
             client_ip = src.sock.getpeername()[0]
             message_uid = evt.uid
             print(f"Message from {client_ip} had uid {message_uid}")
+            allowed = False
             for l in self.allowed_connections:
                 #print(l)
                 if l[0] != message_uid:
                     continue
-                print(f"Found that uid {l[0]} is limited")
+                #print(f"Found that uid {l[0]} is limited")
+                if l[1][0] == "all":
+                    print(f"Message with uid {message_uid} is allowed from all IPs")
+                    allowed = True
+                    continue
                 if client_ip in l[1]:
                     print(f"{client_ip} is allowed to send under {message_uid}")
+                    allowed = True
+                    continue
                 else:
                     print(f"{client_ip} is not allowed to send under {message_uid}")
                     print()
                     return
+            if not allowed:
+                print(f"Message uid {message_uid} is unknown, blocking")
+                print()
+                return
             #print(f"Checking if ip {client_ip} is allowed to send under uid {message_uid}")
         except:
             pass
