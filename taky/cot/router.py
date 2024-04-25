@@ -192,6 +192,8 @@ class COTRouter:
                     print(f"{client_ip} is not allowed to send under {message_uid}")
                     print()
                     return
+            if message_uid[:7] == "bridge-":
+                allowed = True
             if not allowed:
                 print(f"Message uid {message_uid} is unknown, blocking")
                 print()
