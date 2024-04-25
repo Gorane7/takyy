@@ -97,6 +97,10 @@ class MgmtClient(SocketClient):
             if client.user:
                 if isinstance(client, SocketClient):
                     cli_meta["ip"] = client.addr[0]
+                try:
+                    cli_meta["ip"] = client.sock.getpeername()[0]
+                except:
+                    pass
                 cli_meta["uid"] = client.user.uid
                 cli_meta["callsign"] = client.user.callsign
                 cli_meta["group"] = str(client.user.group)
