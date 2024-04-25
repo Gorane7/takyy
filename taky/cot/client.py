@@ -330,6 +330,9 @@ class TAKClient:
             return
 
         if isinstance(evt.detail, models.TAKUser):
+            # NOTES
+            # Here should filter if IP and evt.detail's callsign are an allowed combination
+            
             if self.user is None:
                 self.user = evt.detail
                 # Try to close the COT (ie: anonymous log)
@@ -343,6 +346,7 @@ class TAKClient:
         Generate and send a TAK pong. Clients that do not receive a pong in
         an appropriate amount of time will disconnect.
         """
+        print(f"Responding with pong to {self.sock.getpeername()[0]}")
         now = dt.utcnow()
         pong = models.Event(
             uid="takPong",

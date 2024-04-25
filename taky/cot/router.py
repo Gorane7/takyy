@@ -138,6 +138,13 @@ class COTRouter:
         # NOTES
         # src should be a client object with sock attribute, from which the IP can be read
         # Then evt should contain message and also the target callsign or something
+        # Actually the msg might not contain a callsign, rather the src is either anonymous or has identified itself with a callsign earlier
+        
+        # TODO: Remove, can't actually completely block anon traffic
+        if isinstance(src, TAKClient) and src.user is None or src.user.callsign is None:
+            print(f"Not routing {evt}, because {src} does not have callsign")
+            return
+        print(f"Routing {evt} from {src}")
         
         if not isinstance(evt, models.Event):
             raise ValueError(f"Unable to route {type(evt)}")
