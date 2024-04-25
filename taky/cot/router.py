@@ -154,9 +154,8 @@ class COTRouter:
             
         try:
             client_ip = src.sock.getpeername()[0]
-            print(f"Message from {client_ip}")
             message_uid = evt.uid
-            print(f"Message had uid {message_uid}")
+            print(f"Message from {client_ip} had uid {message_uid}")
             for l in self.allowed_connections:
                 #print(l)
                 if l[0] != message_uid:
