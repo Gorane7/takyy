@@ -281,6 +281,7 @@ class TAKClient:
         """
         # TODO: Specify maximum element size
         self.xdc.feed(data)
+        print(f"Got data {data} from {self.sock.getpeername()[0]}")
 
         for (_, elm) in self.xdc.read_events():
             self.num_rx += 1
