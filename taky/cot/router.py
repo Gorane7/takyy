@@ -32,6 +32,8 @@ class COTRouter:
         self.persist = build_persistence()
         self.last_prune = 0
         self.max_ttl = app_config.getint("cot_server", "max_persist_ttl")
+        self.allowed_connections = eval(app_config.get("custom", "uid_to_ip"))
+        print(self.allowed_connections)
         self.lgr = logging.getLogger(self.__class__.__name__)
 
     def prune(self):
@@ -140,15 +142,35 @@ class COTRouter:
         # Then evt should contain message and also the target callsign or something
         # Actually the msg might not contain a callsign, rather the src is either anonymous or has identified itself with a callsign earlier
         
+        if not isinstance(evt, models.Event):
+            raise ValueError(f"Unable to route {type(evt)}")
+        
         # TODO: Remove, can't actually completely block anon traffic
         if isinstance(src, TAKClient) and src.user is None or src.user.callsign is None:
             print(f"Not routing {evt}, because {src} does not have callsign")
             #return
         else:
             print(f"Routing {evt} from {src}")
-        
-        if not isinstance(evt, models.Event):
-            raise ValueError(f"Unable to route {type(evt)}")
+            
+        try:
+            client_ip = src.sock.getpeername()[0]
+            print(f"Message from {client_ip}")
+            message_uid = evt.uid
+            print(f"Message had uid {message_uid}")
+            for l in self.allowed_connections:
+                #print(l)
+                if l[0] != message_uid:
+                    continue
+                print(f"Found that uid {l[0]} is limited")
+                if client_ip in l[1]:
+                    print(f"{client_ip} is allowed to send under {message_uid}")
+                else:
+                    print(f"{client_ip} is not allowed to send under {message_uid}")
+                    return
+            #print(f"Checking if ip {client_ip} is allowed to send under uid {message_uid}")
+        except:
+            pass
+        print()
 
         # If configured, constrain events to a max TTL
         if self.max_ttl >= 0:
