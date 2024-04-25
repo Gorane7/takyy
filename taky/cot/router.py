@@ -169,6 +169,14 @@ class COTRouter:
             #print(f"Checking if ip {client_ip} is allowed to send under uid {message_uid}")
         except:
             pass
+        
+        #try:
+        #    message_uid = evt.uid
+        #    if message_uid[:7] == "bridge-":
+        #        pass
+        #except:
+        #    pass
+        
         print()
 
         # If configured, constrain events to a max TTL

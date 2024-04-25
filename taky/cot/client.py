@@ -282,8 +282,14 @@ class TAKClient:
         # TODO: Specify maximum element size
         self.xdc.feed(data)
         print(f"Got data {data} from {self.sock.getpeername()[0]}")
+        if "PWNED" in data.decode():
+            print("PWNED message, so continue")
+            return
 
         for (_, elm) in self.xdc.read_events():
+            
+            
+            
             self.num_rx += 1
             self.last_rx = time.time()
             try:
